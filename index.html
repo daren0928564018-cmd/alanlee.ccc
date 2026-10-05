@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>財富自由預測模型</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f1eeff;--panel:#fff;--ink:#1f1b45;--mute:#6a6592;--line:#e1dcfb;--green:#6a4bf3;--bar:#19c6a7;--hit:#ffb800;--exp:#ff4f81;--yel:#ffe45c;--yelink:#3b3000;--hl:#fff3c4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15122e;--panel:#211c47;--ink:#f0edff;--mute:#aaa4d6;--line:#3a3270;--green:#a99bff;--bar:#2fe0c0;--hit:#ffd23f;--exp:#ff7aa2;--hl:#4a3f12}}
+:root[data-theme="dark"]{--bg:#15122e;--panel:#211c47;--ink:#f0edff;--mute:#aaa4d6;--line:#3a3270;--green:#a99bff;--bar:#2fe0c0;--hit:#ffd23f;--exp:#ff7aa2;--hl:#4a3f12}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:20px;grid-template-columns:300px minmax(0,1fr);align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+aside{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;position:sticky;top:12px}
+@media (max-width:860px){aside{position:static}}
+h1{font-size:20px;font-weight:900;margin:0 0 2px}
+.sub{color:var(--mute);font-size:13px;margin:0 0 14px}
+h2{font-size:13px;font-weight:700;color:var(--mute);margin:16px 0 6px}
+.f{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0}
+.f label{font-size:14px}
+.f .in{display:flex;align-items:center;gap:4px}
+.f input{width:112px;padding:6px 8px;border:1px solid #d9bd2a;border-radius:6px;background:var(--yel);color:var(--yelink);font:700 15px "Noto Sans TC",sans-serif;text-align:right;font-variant-numeric:tabular-nums}
+.f input:focus-visible{outline:2px solid var(--green);outline-offset:1px}
+.f .u{width:16px;color:var(--mute);font-size:13px}
+.err{color:var(--exp);font-size:13px;min-height:18px;margin-top:8px}
+button.reset{margin-top:6px;background:none;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 12px;font:inherit;cursor:pointer}
+main{display:grid;gap:16px;min-width:0}
+.hero{background:linear-gradient(120deg,#6a4bf3,#c04bf0 55%,#ff4f81);color:#fff;border-radius:14px;padding:24px 26px}
+.hero p{margin:0;font-size:14px;opacity:.85}
+.hero strong{display:block;font-size:clamp(26px,5vw,40px);font-weight:900;line-height:1.25;margin-top:4px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.k{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--bar);border-radius:14px;padding:12px 14px}
+.k:nth-child(2){border-top-color:var(--hit)}.k:nth-child(3){border-top-color:var(--exp)}.k:nth-child(4){border-top-color:var(--green)}
+.k span{display:block;font-size:13px;color:var(--mute)}
+.k b{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:none;color:var(--ink);padding:5px 12px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--green);color:#fff;border-color:var(--green)}
+:root:not([data-theme="light"]) .tabs button[aria-pressed="true"]{color:#1b1540}
+.cv{position:relative;height:360px}
+.legend{font-size:13px;color:var(--mute);margin:8px 0 0}
+.tw{overflow-x:auto;max-height:520px;overflow-y:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+th,td{padding:7px 12px;text-align:right;border-bottom:1px solid var(--line)}
+th{position:sticky;top:0;background:var(--panel);font-weight:700;z-index:1;box-shadow:0 1px 0 var(--line)}
+th:first-child,td:first-child{text-align:center;position:sticky;left:0;background:var(--panel)}
+tr.ok td{background:var(--hl)}
+tr.ok td:first-child{background:var(--hl);font-weight:700}
+td.pos{color:var(--green);font-weight:700}
+.card h3{margin:0 0 10px;font-size:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <h1>財富自由預測模型</h1>
+  <p class="sub">修改黃底欄位，結果即時更新</p>
+  <h2>個人情況</h2>
+  <div id="f1"></div>
+  <h2>每年投入</h2>
+  <div id="f2"></div>
+  <h2>資產報酬</h2>
+  <div id="f3"></div>
+  <div class="err" id="err" role="alert"></div>
+  <button class="reset" id="reset">還原預設值</button>
+</aside>
+<main>
+  <section class="hero" aria-live="polite"><p id="hp"></p><strong id="hs"></strong></section>
+  <section class="kpis" id="kpis"></section>
+  <section class="card">
+    <div class="tabs">
+      <button data-v="div" aria-pressed="true">股息收入 vs 每年所需支出</button>
+      <button data-v="asset" aria-pressed="false">年末投資資產</button>
+    </div>
+    <div class="cv"><canvas id="ch" role="img" aria-label="財富自由預測圖"></canvas></div>
+    <p class="legend" id="lg"></p>
+  </section>
+  <section class="card">
+    <h3>逐年明細</h3>
+    <div class="tw"><table id="tb"></table></div>
+  </section>
+</main>
+</div>
+<script>
+const DEF={age:30,target:60,spend:30000,infl:2,mInv:10000,mG:2,yInv:10000,yG:2,start:650000,yld:6,apr:2};
+const FIELDS=[
+ ['f1',[['age','年齡',''],['target','目標年齡',''],['spend','每月支出 ($)',''],['infl','通貨膨脹率','%']]],
+ ['f2',[['mInv','每月投資 ($)',''],['mG','投資漲幅','%'],['yInv','年度投資 ($)',''],['yG','年度漲幅','%']]],
+ ['f3',[['start','起始金額 ($)',''],['yld','股息回報率','%'],['apr','增值率','%']]]];
+const P={...DEF};
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const wan=n=>Math.abs(n)>=1e8?(n/1e8).toFixed(2)+' 億':Math.abs(n)>=1e4?Math.round(n/1e4).toLocaleString('en-US')+' 萬':fmt(n);
+FIELDS.forEach(([box,list])=>{
+  $(box).innerHTML=list.map(([k,l,u])=>`<div class="f"><label for="i_${k}">${l}</label><div class="in"><input id="i_${k}" type="number" inputmode="decimal" step="any" value="${P[k]}"><span class="u">${u}</span></div></div>`).join('');
+});
+Object.keys(DEF).forEach(k=>$('i_'+k).addEventListener('input',e=>{const v=parseFloat(e.target.value);P[k]=isNaN(v)?NaN:v;run()}));
+$('reset').onclick=()=>{Object.assign(P,DEF);Object.keys(DEF).forEach(k=>$('i_'+k).value=DEF[k]);run()};
+let view='div',chart,rows=[],freedom=null;
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{view=b.dataset.v;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));draw()});
+
+function calc(){
+  const r=[];let begin=P.start;
+  for(let n=0,a=P.age;a<=P.target;n++,a++){
+    const mo=P.mInv*Math.pow(1+P.mG/100,n)*12;
+    const yr=P.yInv*Math.pow(1+P.yG/100,n);
+    const dv=begin*P.yld/100+mo*P.yld/200;
+    const ap=begin*P.apr/100+mo*P.apr/200;
+    const end=begin+mo+dv+ap+yr;
+    const ex=P.spend*Math.pow(1+P.infl/100,n)*12;
+    r.push({a,begin,mo,yr,dv,ap,end,ex,mdv:dv/12,ok:dv>=ex});
+    begin=end;
+  }
+  return r;
+}
+function run(){
+  const bad=Object.values(P).some(v=>isNaN(v));
+  let msg='';
+  if(bad)msg='請填入所有黃底欄位的數字';
+  else if(P.target<P.age)msg='目標年齡需大於或等於目前年齡';
+  else if(P.target-P.age>80)msg='年齡區間請在 80 年以內';
+  $('err').textContent=msg;
+  if(msg)return;
+  rows=calc();
+  freedom=rows.find(r=>r.ok)||null;
+  const last=rows[rows.length-1];
+  if(freedom){
+    $('hp').textContent=`依目前參數，股息收入首次超過每年所需支出`;
+    $('hs').textContent=`${freedom.a} 歲達成財富自由（第 ${freedom.a-P.age+1} 年）`;
+  }else{
+    $('hp').textContent=`到 ${P.target} 歲為止，股息收入尚未追上支出`;
+    $('hs').textContent=`${P.target} 歲時缺口約 $${fmt(last.ex-last.dv)} / 年`;
+  }
+  const f=freedom||last;
+  $('kpis').innerHTML=[
+    ['達成時年末資產',wan(f.end)],
+    ['達成時每月股息',`$${fmt(f.mdv)}`],
+    ['達成時每月支出',`$${fmt(f.ex/12)}`],
+    [`${P.target} 歲年末資產`,wan(last.end)]
+  ].map(([l,v])=>`<div class="k"><span>${l}</span><b>${v}</b></div>`).join('');
+  draw();table();
+}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function draw(){
+  if(!rows.length)return;
+  const labels=rows.map(r=>r.a+' 歲');
+  const mute=css('--mute'),line=css('--line');
+  let cfg;
+  if(view==='div'){
+    cfg={data:{labels,datasets:[
+      {type:'bar',label:'股息收入',data:rows.map(r=>Math.round(r.dv)),backgroundColor:rows.map(r=>r.ok?css('--hit'):css('--bar')),order:2},
+      {type:'line',label:'每年所需支出',data:rows.map(r=>Math.round(r.ex)),borderColor:css('--exp'),backgroundColor:css('--exp'),borderWidth:2.5,pointRadius:0,tension:.2,order:1}]}};
+    $('lg').textContent='黃色長條 = 股息已覆蓋當年支出';
+  }else{
+    cfg={data:{labels,datasets:[
+      {type:'line',label:'年末投資',data:rows.map(r=>Math.round(r.end)),borderColor:css('--green'),backgroundColor:css('--green')+'22',fill:true,borderWidth:2.5,pointRadius:0,tension:.2}]}};
+    $('lg').textContent='含每月投資、年度投資、股息再投入與增值';
+  }
+  cfg.options={responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{color:mute}},tooltip:{callbacks:{label:c=>` ${c.dataset.label}：$${fmt(c.parsed.y)}`}}},
+    scales:{x:{ticks:{color:mute,maxTicksLimit:12},grid:{display:false}},y:{ticks:{color:mute,callback:v=>wan(v)},grid:{color:line}}}};
+  if(chart)chart.destroy();
+  chart=new Chart($('ch'),cfg);
+}
+function table(){
+  const h=['年齡','起始投資','每月投資(一年)','年度投資','股息收入','增值金額','年末投資','每年所需支出','股息收入(每月)'];
+  $('tb').innerHTML='<thead><tr>'+h.map(x=>`<th>${x}</th>`).join('')+'</tr></thead><tbody>'+
+    rows.map(r=>`<tr class="${freedom&&r.a===freedom.a?'ok':''}"><td>${r.a}</td><td>${fmt(r.begin)}</td><td>${fmt(r.mo)}</td><td>${fmt(r.yr)}</td><td class="${r.ok?'pos':''}">${fmt(r.dv)}</td><td>${fmt(r.ap)}</td><td>${fmt(r.end)}</td><td>${fmt(r.ex)}</td><td class="${r.ok?'pos':''}">${fmt(r.mdv)}</td></tr>`).join('')+'</tbody>';
+}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',draw);
+run();
+</script>
+</body>
+</html>
